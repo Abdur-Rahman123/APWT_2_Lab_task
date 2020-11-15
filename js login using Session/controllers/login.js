@@ -1,39 +1,51 @@
-const express 	= require('express');
-const router 	= express.Router();
+const express = require('express');
+const router = express.Router();
+const userModel = require.main.require('./models/userModel');
+//const fs = require('fs');
 
 router.get('/', (req, res)=>{
 	res.render('login/index');
 });
 
 router.post('/', (req, res)=>{
-	var userlist = [
-		['1', 'alamin', 'abc@gmail.com', '123'],
-		['2', 'pqr', 'pqr@gmail.com', '123'],
-		['3', 'xyz', 'xyz@gmail.com', '123'],
-		['4','nur','nur@gmail.com','1']
-	];
-	req.session.userlist = userlist;
-	req.session.uid = '4';
-	userlist = req.session.userlist;
-	var loggedin = false;
+	// var data = fs.readFileSync('./controllers/userlist.json', 'utf8');
+	// var userlist = JSON.parse(data);
+	// var logged = false;
 
-	userlist.forEach(function(user){
-		if(req.body.username == user[1] && req.body.password == user[3]){
-			loggedin = true;
+	// userlist.forEach(function(user){
+	// 	if(req.body.username == user.username && req.body.password == user.password){
+	// 		logged = true;
+	// 	}
+	// });
+	
+	// if(logged){
+	// 	res.cookie('uname', req.body.username);
+	// 	var userlist = [
+	// 		['1', 'alamin', '123', 'alamin@gmail.com'],
+	// 		['2', 'nabin', '333', 'nabin@gmail.com']
+	// 	]
+	// 	req.session.userlist = userlist;
+	// 	req.session.userid = '2';
+	// 	userlist = req.session.userlist;
+	// 	res.redirect('/home');
+		
+	// }else{
+	// 	res.redirect('/login');
+	// }
+	var user = {
+		username : req.body.username,
+		password : req.body.password
+	}
+	userModel.validate(user, function(status){
+		if(status){
+			res.cookie('uname', req.body.username);
+			res.redirect('/home');
+		}else{
+			res.redirect('/login');
 		}
 	});
-
-	if(loggedin){
-		res.cookie('uname', req.body.username);
-		res.redirect('/home');
-
-	}else{
-		res.redirect('/login');
-	}
-}); 
-
+	
+	
+} );
 
 module.exports = router;
-
-
-
